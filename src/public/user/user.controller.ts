@@ -112,7 +112,7 @@ export class UserController {
   // VERIFY OTP
   static async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
-      const { email, otp, newPassword } = req.body;
+      const { email,mobile, otp, newPassword } = req.body;
 
       const record = await Otp.findOne({ email });
       if (!record)
