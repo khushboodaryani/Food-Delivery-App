@@ -126,6 +126,76 @@ export class OwnerController {
             next(err);
         }
     }
+
+    static async verifyOtp(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { mobile, otp } = req.body;
+
+    if (!mobile || !otp) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "Mobile number and OTP are required"));
+    }
+
+    const otpDoc = await Otp.findOne({ mobile });
+
+    if (!otpDoc || otpDoc.expiresAt < new Date()) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "Invalid or expired OTP"));
+    }
+
+    if (otpDoc.otp !== otp) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "Incorrect OTP"));
+    }
+
+    if (otpDoc.verified) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "OTP already used"));
+    }
+
+    otpDoc.verified = true;
+    await otpDoc.save();
+
+    const owner: any = await Owner.findOne({ mobile });
+    if (!owner) {
+      return res
+        .status(404)
+        .json(new ApiError(404, "Owner not found"));
+    }
+
+    // Optional flags if you want later
+    // owner.isMobileVerified = true;
+    await owner.save();
+
+    const payload = {
+      _id: owner._id,
+      email: owner.email,
+      role: "owner",
+    };
+
+    const token = jwt.sign(payload, config.jwt.secret, {
+      expiresIn: "7d",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+      token,
+      owner,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
     static async deleteOwner(req: Request , res: Response, next:NextFunction){
         try{
          const {_id}= (req as any).user;
