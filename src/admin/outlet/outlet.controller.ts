@@ -38,7 +38,7 @@ export class OutletController {
       const outlet = await outletService.create({
         ownerId,
         name,
-        description,
+        // description,
         address,
         coordinates,
         mobile,
