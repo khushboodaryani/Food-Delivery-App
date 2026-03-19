@@ -196,6 +196,35 @@ export class OwnerController {
   }
 }
 
+    static async getAllOwners(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await ownerService.getAll(req.query);
+            return res.status(200).json(new ApiResponse(200, result, "Owners fetched successfully"));
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async getOwnerById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const owner = await ownerService.getById(id);
+            return res.status(200).json(new ApiResponse(200, owner, "Owner fetched successfully"));
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    static async updateOwner(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const updated = await ownerService.updateById(id, req.body);
+            return res.status(200).json(new ApiResponse(200, updated, "Owner updated successfully"));
+        } catch (err) {
+            next(err);
+        }
+    }
+
     static async deleteOwner(req: Request , res: Response, next:NextFunction){
         try{
          const {_id}= (req as any).user;

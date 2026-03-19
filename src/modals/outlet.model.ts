@@ -1,76 +1,81 @@
-import mongoose, {Schema, Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IOutlet extends Document{
+export interface IOutlet extends Document {
     ownerId: mongoose.Types.ObjectId;
     name: string;
+    description?: string;
     address: string;
-    coordinates:{
+    coordinates?: {
         lat: number;
         lng: number;
     };
-    mobile?:string;
+    mobile?: string;
     email?: string;
     avatar?: string;
     images?: string[];
-    isOpen:boolean;
-    status:"active"|"inactive";
+    isOpen: boolean;
+    status: "active" | "inactive";
     createdAt: Date;
     updatedAt: Date;
 }
 
 const outletSchema = new Schema<IOutlet>(
     {
-        ownerId:{
+        ownerId: {
             type: Schema.Types.ObjectId,
-            ref:"Owner",
-            required:true,
-            index:true,
+            ref: "Owner",
+            required: true,
+            index: true,
         },
-        name:{
+        name: {
             type: String,
             required: true,
             trim: true,
         },
-        address:{
-            type:String,
-            required:true,
-            trim:true,
-        },
-        coordinates:{
-            lat:{type:Number, required:true},
-            lan:{type:Number, required:true},
-        },
-        mobile:{
-            type:String,
+        description: {
+            type: String,
             trim: true,
-            unique:true,
         },
-        email:{
-            type:String,
-            trim:true,
-            lowercase:true,
-            unique:true,
+        address: {
+            type: String,
+            required: true,
+            trim: true,
         },
-        avatar:{type:String},
-        images:{
-            type:[String],
-            default:[],
+        coordinates: {
+            lat: { type: Number },
+            lng: { type: Number },
         },
-        isOpen:{
-            type:Boolean,
-            default:false,
+        mobile: {
+            type: String,
+            trim: true,
+            unique: true,
         },
-        status:{
-            type:String,
-            enum:["active","inactive"],
-            default:"active"
-        } ,
+        email: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            unique: true,
+        },
+        avatar: { type: String },
+        images: {
+            type: [String],
+            default: [],
+        },
+        isOpen: {
+            type: Boolean,
+            default: false,
+        },
+        status: {
+            type: String,
+            enum: ["active", "inactive"],
+            default: "active"
+        },
 
     },
     {
-        timestamps:true,
+        timestamps: true,
     }
 
 );
 
-export const Outlet = mongoose.model<IOutlet>("Outlet",outletSchema)
+export const Outlet = mongoose.model<IOutlet>("Outlet", outletSchema)

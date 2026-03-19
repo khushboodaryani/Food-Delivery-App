@@ -25,6 +25,7 @@ export class OutletController {
         coordinates,
         mobile,
         email,
+        // avatar & images are injected by cloudinaryUploaderMiddleware into req.body
         avatar,
         images,
       } = req.body;
@@ -38,13 +39,13 @@ export class OutletController {
       const outlet = await outletService.create({
         ownerId,
         name,
-        // description,
+        description,
         address,
         coordinates,
         mobile,
         email,
-        avatar,
-        images,
+        avatar,   // Cloudinary URL (string) or undefined
+        images,   // Cloudinary URLs (string[]) or undefined
       });
 
       return res
