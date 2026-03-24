@@ -8,6 +8,7 @@ import { Server as HttpServer } from "http";
 import { watchEnvFile } from "./config/envWatcher";
 import { configureSocket } from "./config/socket.io";
 import { config as manualConfig } from "./config/config"
+import { createDefaultAdmin } from "./utils/createDefaultAdmin";
 
 // Load environment variables
 config();
@@ -62,6 +63,7 @@ process.on("SIGINT", shutdown);
 const startServer = async (): Promise<void> => {
   try {
     await connectDB(); // Establish database connection
+    await createDefaultAdmin(); // Create default admin if enabled
     httpServer.listen(port, () => {
       logger.info(
         `Server is running at http://localhost:${port}`.blue,

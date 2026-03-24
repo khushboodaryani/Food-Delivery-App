@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { MenuItemController } from "./menuItem.controller";
 import { asyncHandler } from "../../utils/asyncHandler";
-
-// import { verifyOwner } from "../../middlewares/auth.middleware";
+import { authenticateToken } from "../../middlewares/authMiddleware";
+import {
+  dynamicUpload,
+  cloudinaryUploaderMiddleware,
+} from "../../middlewares/cloudinaryUploader";
 
 const router = Router();
 
@@ -14,29 +17,29 @@ router.get(
   "/outlet/:outletId",
   asyncHandler(MenuItemController.getMenuItemsByOutlet)
 );
-router.get(
-  "/category/:categoryId",
-  asyncHandler(MenuItemController.getMenuItemsByCategory)
-);
 
 // =======================
 // OWNER PROTECTED ROUTES
 // =======================
 router.post(
-  "/create",
-//   verifyOwner,
+  "/",
+  authenticateToken,
+  dynamicUpload([{ name: "image", maxCount: 1 }]),
+  cloudinaryUploaderMiddleware("menuItems"),
   asyncHandler(MenuItemController.createMenuItem)
 );
 
 router.put(
   "/update/:id",
-//   verifyOwner,
+  authenticateToken,
+  dynamicUpload([{ name: "image", maxCount: 1 }]),
+  cloudinaryUploaderMiddleware("menuItems"),
   asyncHandler(MenuItemController.updateMenuItem)
 );
 
 router.delete(
   "/delete/:id",
-//   verifyOwner,
+  authenticateToken,
   asyncHandler(MenuItemController.deleteMenuItem)
 );
 

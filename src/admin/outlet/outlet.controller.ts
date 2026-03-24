@@ -18,7 +18,9 @@ export class OutletController {
     try {
       const ownerId = req.user._id;
 
-      const {
+      console.log("--- CREATE OUTLET REQ.BODY ---", req.body);
+
+      let {
         name,
         description,
         address,
@@ -29,6 +31,15 @@ export class OutletController {
         avatar,
         images,
       } = req.body;
+
+      // Handle stringified coordinates (common with FormData)
+      if (typeof coordinates === "string") {
+        try {
+          coordinates = JSON.parse(coordinates);
+        } catch (e) {
+          console.error("Failed to parse coordinates:", e);
+        }
+      }
 
       if (!name || !address || !coordinates?.lat || !coordinates?.lng) {
         return res
@@ -111,6 +122,17 @@ export class OutletController {
     try {
       const ownerId = req.user._id;
       const { id } = req.params;
+
+      console.log("--- UPDATE OUTLET REQ.BODY ---", req.body);
+
+      // Handle stringified coordinates (common with FormData)
+      if (typeof req.body.coordinates === "string") {
+        try {
+          req.body.coordinates = JSON.parse(req.body.coordinates);
+        } catch (e) {
+          console.error("Failed to parse coordinates in update:", e);
+        }
+      }
 
       const outlet: any = await Outlet.findOne({
         _id: id,

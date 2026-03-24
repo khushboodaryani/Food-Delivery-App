@@ -6,6 +6,7 @@ import { User } from "../../modals/user.model";
 import Otp from "../../modals/otp.model";
 import { sendEmail } from "../../utils/emailService";
 import { Request, Response, NextFunction } from "express";
+import { CommonService } from "../../services/common.services";
 
 export class UserController {
 
@@ -172,6 +173,19 @@ export class UserController {
       return res
         .status(200)
         .json(new ApiResponse(200, deleted, "User deleted successfully"));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // GET ALL OTPS
+  static async getAllOtps(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otpService = new CommonService(Otp);
+      const result = await otpService.getAll(req.query);
+      return res
+        .status(200)
+        .json(new ApiResponse(200, result, "OTPs fetched successfully"));
     } catch (err) {
       next(err);
     }

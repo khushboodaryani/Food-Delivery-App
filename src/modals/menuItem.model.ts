@@ -1,18 +1,25 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IMenuItem extends Document {
-    outletId: mongoose.Types.ObjectId;
-    categoryId: mongoose.Types.ObjectId;
+    menuId: mongoose.Types.ObjectId;
 
     name: string;
     description?: string;
 
     price: number;
-    // discountedPrice?: number;
+    discountPercentage: number;
+    discountedPrice: number;
 
     image?: string;
     isVeg: boolean;
+    isEgg: boolean;
+    isNonVeg: boolean;
+    isSpicy: boolean;
+    isBestSeller: boolean;
     isAvailable: boolean;
+
+    allergens: string[];
+    customizable: boolean;
 
     status: "active" | "inactive";
 
@@ -22,16 +29,9 @@ export interface IMenuItem extends Document {
 
 const menuItemSchema = new Schema<IMenuItem>(
     {
-        outletId: {
+        menuId: {
             type: Schema.Types.ObjectId,
-            ref: "Outlet",
-            required: true,
-            index: true,
-        },
-
-        categoryId: {
-            type: Schema.Types.ObjectId,
-            ref: "Category",
+            ref: "Menu",
             required: true,
             index: true,
         },
@@ -48,7 +48,16 @@ const menuItemSchema = new Schema<IMenuItem>(
             type: Number,
             required: true,
         },
-
+        discountPercentage: {
+            type: Number,
+            default: 0,
+        },
+        discountedPrice: {
+            type: Number,
+            default: function (this: any) {
+                return this.price;
+            },
+        },
         image: {
             type: String,
         },
@@ -56,16 +65,39 @@ const menuItemSchema = new Schema<IMenuItem>(
             type: Boolean,
             default: true,
         },
+        isEgg: {
+            type: Boolean,
+            default: false,
+        },
+        isNonVeg: {
+            type: Boolean,
+            default: false,
+        },
+        isSpicy: {
+            type: Boolean,
+            default: false,
+        },
+        isBestSeller: {
+            type: Boolean,
+            default: false,
+        },
         isAvailable: {
             type: Boolean,
             default: true,
         },
-
+        allergens: {
+            type: [String],
+            default: [],
+        },
+        customizable: {
+            type: Boolean,
+            default: false,
+        },
         status: {
             type: String,
             enum: ["active", "inactive"],
-            default: "active"
-        }
+            default: "active",
+        },
 
     },
     {

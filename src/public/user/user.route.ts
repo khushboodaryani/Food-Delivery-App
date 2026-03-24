@@ -28,6 +28,9 @@ router.post("/send-otp", asyncHandler(UserController.generateOtp));
 // Verify OTP (reset password)
 router.post("/verify-otp", asyncHandler(UserController.verifyOtp));
 
+// Get all OTPs (for admin views)
+router.get("/otp/all", asyncHandler(UserController.getAllOtps));
+
 /* ----------- PROTECTED ROUTES ----------- */
 
 // Update user with profile (avatar) upload

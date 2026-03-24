@@ -1,6 +1,6 @@
 import Admin from "../modals/admin.model";
 import { config } from "../config/config";
-// import { User } from "../modals/user.model";
+import { User } from "../modals/user.model";
 import { generateAccessToken } from "../utils/token";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { Request, Response, NextFunction, RequestHandler } from "express";
@@ -115,7 +115,7 @@ export const authorize =
     return next();
   };
 
-const getUserByRole = async (role: Role, id: string) => {
+async function getUserByRole(role: Role, id: string) {
   const modelMap: Record<Role, any> = {
     admin: Admin,
     // guest: User,
@@ -123,4 +123,43 @@ const getUserByRole = async (role: Role, id: string) => {
   };
   const Model = modelMap[role];
   return Model?.findById(id);
+};
+
+export const authenticateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  const accessToken = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!accessToken) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Access token missing." });
+  }
+
+  try {
+    const decoded = jwt.verify(accessToken, config.jwt.secret) as any;
+    
+    // User token uses 'id' instead of '_id' typically in generateJWT()
+    const userId = decoded.id || decoded._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found." });
+    }
+
+    if (user.status !== "active") {
+        return res.status(403).json({ success: false, message: "User account is not active." });
+    }
+
+    (req as any).user = user;
+    return next();
+  } catch (err) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid or expired access token." });
+  }
 };
