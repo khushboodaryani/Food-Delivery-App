@@ -7,10 +7,13 @@ import { config } from "../../config/config";
 import ApiResponse from "../../utils/ApiResponse";
 import ApiError from "../../utils/ApiError";
 
-const razorpay = new Razorpay({
-  key_id: config.payment.razorpay.keyId || "",
-  key_secret: config.payment.razorpay.keySecret || "",
-});
+let razorpay: Razorpay | null = null;
+if (config.payment.razorpay.keyId && config.payment.razorpay.keySecret) {
+  razorpay = new Razorpay({
+    key_id: config.payment.razorpay.keyId,
+    key_secret: config.payment.razorpay.keySecret,
+  });
+}
 
 export class PaymentController {
   /**
@@ -18,6 +21,10 @@ export class PaymentController {
    */
   static async createPayment(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!razorpay) {
+        return res.status(500).json(new ApiError(500, "Payment gateway is not configured (missing Razorpay keys)"));
+      }
+
       const userId = (req as any).user._id;
       const { orderId } = req.body;
 

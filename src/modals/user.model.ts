@@ -26,8 +26,7 @@ const AddressSchema = new Schema(
     fullAddress: { type: String, required: true },
     coordinates: { type: CoordinatesSchema, required: true },
     isDefault: { type: Boolean, default: false },
-  },
-  { _id: false }
+  }
 );
 
 // ---- USER INTERFACE ----

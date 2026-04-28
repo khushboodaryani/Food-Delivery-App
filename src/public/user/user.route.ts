@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { UserController } from "./user.controller";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { authenticateUser } from "../../middlewares/authMiddleware";
 
 import {
   dynamicUpload,
@@ -43,5 +44,19 @@ router.put(
 
 // Delete user
 router.delete("/:id", asyncHandler(UserController.deleteUser));
+
+/* ----------- ADDRESS ROUTES ----------- */
+
+// Add address
+router.post("/address", authenticateUser, asyncHandler(UserController.addAddress));
+
+// Get all addresses
+router.get("/address", authenticateUser, asyncHandler(UserController.getAddresses));
+
+// Update address
+router.put("/address/:addressId", authenticateUser, asyncHandler(UserController.updateAddress));
+
+// Delete address
+router.delete("/address/:addressId", authenticateUser, asyncHandler(UserController.deleteAddress));
 
 export default router;

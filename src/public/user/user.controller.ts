@@ -190,4 +190,118 @@ export class UserController {
       next(err);
     }
   }
+
+  // ADD ADDRESS
+  static async addAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user._id;
+      const { label, fullAddress, coordinates, isDefault } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json(new ApiError(404, "User not found"));
+      }
+
+      // If isDefault is true, unset other defaults
+      if (isDefault) {
+        user.addresses.forEach((addr: any) => {
+          addr.isDefault = false;
+        });
+      }
+
+      user.addresses.push({ label, fullAddress, coordinates, isDefault } as any);
+      await user.save();
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, user.addresses, "Address added successfully"));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // GET ADDRESSES
+  static async getAddresses(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user._id;
+      const user = await User.findById(userId).select("addresses");
+
+      if (!user) {
+        return res.status(404).json(new ApiError(404, "User not found"));
+      }
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, user.addresses, "Addresses fetched successfully"));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // UPDATE ADDRESS
+  static async updateAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user._id;
+      const { addressId } = req.params;
+      const { label, fullAddress, coordinates, isDefault } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json(new ApiError(404, "User not found"));
+      }
+
+      const address = (user.addresses as any[]).find(
+        (addr) => addr._id.toString() === addressId
+      );
+
+      if (!address) {
+        return res.status(404).json(new ApiError(404, "Address not found"));
+      }
+
+      if (label) address.label = label;
+      if (fullAddress) address.fullAddress = fullAddress;
+      if (coordinates) address.coordinates = coordinates;
+      if (isDefault !== undefined) {
+        if (isDefault) {
+          user.addresses.forEach((addr: any) => {
+            addr.isDefault = false;
+          });
+        }
+        address.isDefault = isDefault;
+      }
+
+      await user.save();
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, user.addresses, "Address updated successfully"));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // DELETE ADDRESS
+  static async deleteAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user._id;
+      const { addressId } = req.params;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json(new ApiError(404, "User not found"));
+      }
+
+      user.addresses = (user.addresses as any[]).filter(
+        (addr) => addr._id.toString() !== addressId
+      );
+
+      await user.save();
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, user.addresses, "Address deleted successfully"));
+    } catch (err) {
+      next(err);
+    }
+  }
 }

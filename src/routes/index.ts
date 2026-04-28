@@ -12,6 +12,11 @@ import locationRoutes from "../admin/location/location.routes";
 import userPreferenceRoutes from "../admin/userpreference/userpreference.routes";
 import abuseReportRoutes from "../admin/abusereport/abusereport.routes";
 import bookmarkRoutes from "../admin/bookmark/bookmark.routes";
+import cartRoutes from "../public/cart/cart.routes";
+import orderRoutes from "../public/order/order.routes";
+import paymentRoutes from "../public/payment/payment.routes";
+import searchRoutes from "../public/search/search.routes";
+import favoriteRoutes from "../public/favorite/favorite.routes";
 
 const router = Router();
 router.use("/user", userRoutes);
@@ -28,5 +33,11 @@ router.use("/location", locationRoutes);
 router.use("/userpreference", userPreferenceRoutes);
 router.use("/abusereport", abuseReportRoutes);
 router.use("/bookmark", bookmarkRoutes);
+
+router.use("/cart", cartRoutes);
+router.use("/order", orderRoutes);
+router.use("/payment", paymentRoutes);
+router.use("/search", searchRoutes);
+router.use("/favorite", favoriteRoutes);
 
 export default router;
